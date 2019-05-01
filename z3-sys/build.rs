@@ -7,6 +7,7 @@ fn main() {
     let bindings = bindgen::Builder::default()
         .header("src/wrapper.h")
         .prepend_enum_name(false)
+        .default_enum_style(bindgen::EnumVariation::Rust)
         .blacklist_item("Z3_TRUE")
         .blacklist_item("Z3_FALSE")
         .generate()
