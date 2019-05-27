@@ -3,6 +3,7 @@ use std::path::PathBuf;
 
 fn main() {
     println!("cargo:rustc-link-lib=z3");
+    println!("cargo:rustc-link-search=native=/home/jrakow/.local/lib");
 
     let bindings = bindgen::Builder::default()
         .header("src/wrapper.h")
