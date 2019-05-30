@@ -277,6 +277,8 @@ impl<'ctx> Ast<'ctx> {
     binop!(bvshl, Z3_mk_bvshl);
     binop!(bvlshr, Z3_mk_bvlshr);
     binop!(bvashr, Z3_mk_bvashr);
+    binop!(bvrotl, Z3_mk_ext_rotate_left);
+    binop!(bvrotr, Z3_mk_ext_rotate_right);
 
     // Array ops
     binop!(select, Z3_mk_select);
