@@ -3,14 +3,12 @@ use Ast;
 use Model;
 use Optimize;
 use Solver;
-use Z3_MUTEX;
 
 impl<'ctx> Model<'ctx> {
     pub fn of_solver(slv: &Solver<'ctx>) -> Model<'ctx> {
         Model {
             ctx: slv.ctx,
             z3_mdl: unsafe {
-                let guard = Z3_MUTEX.lock().unwrap();
                 let m = Z3_solver_get_model(slv.ctx.z3_ctx, slv.z3_slv);
                 Z3_model_inc_ref(slv.ctx.z3_ctx, m);
                 m
@@ -22,7 +20,6 @@ impl<'ctx> Model<'ctx> {
         Model {
             ctx: opt.ctx,
             z3_mdl: unsafe {
-                let guard = Z3_MUTEX.lock().unwrap();
                 let m = Z3_optimize_get_model(opt.ctx.z3_ctx, opt.z3_opt);
                 Z3_model_inc_ref(opt.ctx.z3_ctx, m);
                 m
@@ -32,10 +29,8 @@ impl<'ctx> Model<'ctx> {
 
     pub fn eval(&self, ast: &Ast<'ctx>) -> Option<Ast<'ctx>> {
         let mut tmp: Z3_ast = ast.z3_ast;
-        let res = {
-            let guard = Z3_MUTEX.lock().unwrap();
-            unsafe { Z3_model_eval(self.ctx.z3_ctx, self.z3_mdl, ast.z3_ast, true, &mut tmp) }
-        };
+        let res =
+            unsafe { Z3_model_eval(self.ctx.z3_ctx, self.z3_mdl, ast.z3_ast, true, &mut tmp) };
         if res {
             Some(Ast::new(self.ctx, tmp))
         } else {
@@ -50,14 +45,17 @@ impl<'ctx> std::fmt::Display for Model<'ctx> {
         if p.is_null() {
             Err(std::fmt::Error)
         } else {
-            write!(f, "{}", unsafe { std::ffi::CStr::from_ptr(p) }.to_str().unwrap())
+            write!(
+                f,
+                "{}",
+                unsafe { std::ffi::CStr::from_ptr(p) }.to_str().unwrap()
+            )
         }
     }
 }
 
 impl<'ctx> Drop for Model<'ctx> {
     fn drop(&mut self) {
-        let guard = Z3_MUTEX.lock().unwrap();
         unsafe { Z3_model_dec_ref(self.ctx.z3_ctx, self.z3_mdl) };
     }
 }

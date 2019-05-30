@@ -7,16 +7,12 @@ use Context;
 use FuncDecl;
 use Sort;
 use Symbol;
-use Z3_MUTEX;
 
 impl<'ctx> Sort<'ctx> {
     pub fn uninterpreted(ctx: &'ctx Context, sym: &Symbol<'ctx>) -> Sort<'ctx> {
         Sort {
             ctx,
-            z3_sort: unsafe {
-                let guard = Z3_MUTEX.lock().unwrap();
-                Z3_mk_uninterpreted_sort(ctx.z3_ctx, sym.z3_sym)
-            },
+            z3_sort: unsafe { Z3_mk_uninterpreted_sort(ctx.z3_ctx, sym.z3_sym) },
         }
     }
 
@@ -24,7 +20,6 @@ impl<'ctx> Sort<'ctx> {
         Sort {
             ctx,
             z3_sort: unsafe {
-                let guard = Z3_MUTEX.lock().unwrap();
                 let s = Z3_mk_bool_sort(ctx.z3_ctx);
                 Z3_inc_ref(ctx.z3_ctx, Z3_sort_to_ast(ctx.z3_ctx, s));
                 s
@@ -36,7 +31,6 @@ impl<'ctx> Sort<'ctx> {
         Sort {
             ctx,
             z3_sort: unsafe {
-                let guard = Z3_MUTEX.lock().unwrap();
                 let s = Z3_mk_int_sort(ctx.z3_ctx);
                 Z3_inc_ref(ctx.z3_ctx, Z3_sort_to_ast(ctx.z3_ctx, s));
                 s
@@ -48,7 +42,6 @@ impl<'ctx> Sort<'ctx> {
         Sort {
             ctx,
             z3_sort: unsafe {
-                let guard = Z3_MUTEX.lock().unwrap();
                 let s = Z3_mk_real_sort(ctx.z3_ctx);
                 Z3_inc_ref(ctx.z3_ctx, Z3_sort_to_ast(ctx.z3_ctx, s));
                 s
@@ -60,7 +53,6 @@ impl<'ctx> Sort<'ctx> {
         Sort {
             ctx,
             z3_sort: unsafe {
-                let guard = Z3_MUTEX.lock().unwrap();
                 let s = Z3_mk_bv_sort(ctx.z3_ctx, sz as ::std::os::raw::c_uint);
                 Z3_inc_ref(ctx.z3_ctx, Z3_sort_to_ast(ctx.z3_ctx, s));
                 s
@@ -72,7 +64,6 @@ impl<'ctx> Sort<'ctx> {
         Sort {
             ctx,
             z3_sort: unsafe {
-                let guard = Z3_MUTEX.lock().unwrap();
                 let s = Z3_mk_array_sort(ctx.z3_ctx, domain.z3_sort, range.z3_sort);
                 Z3_inc_ref(ctx.z3_ctx, Z3_sort_to_ast(ctx.z3_ctx, s));
                 s
@@ -84,7 +75,6 @@ impl<'ctx> Sort<'ctx> {
         Sort {
             ctx,
             z3_sort: unsafe {
-                let guard = Z3_MUTEX.lock().unwrap();
                 let s = Z3_mk_set_sort(ctx.z3_ctx, elt.z3_sort);
                 Z3_inc_ref(ctx.z3_ctx, Z3_sort_to_ast(ctx.z3_ctx, s));
                 s
@@ -179,7 +169,6 @@ impl<'ctx> Sort<'ctx> {
     /// ```
     pub fn from_u64(&self, u: u64) -> Ast<'ctx> {
         Ast::new(self.ctx, unsafe {
-            let guard = Z3_MUTEX.lock().unwrap();
             Z3_mk_unsigned_int64(self.ctx.z3_ctx, u, self.z3_sort)
         })
     }
@@ -208,7 +197,6 @@ impl<'ctx> Sort<'ctx> {
     /// ```
     pub fn from_i64(&self, i: i64) -> Ast<'ctx> {
         Ast::new(self.ctx, unsafe {
-            let guard = Z3_MUTEX.lock().unwrap();
             Z3_mk_int64(self.ctx.z3_ctx, i, self.z3_sort)
         })
     }

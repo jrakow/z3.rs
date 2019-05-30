@@ -2,7 +2,6 @@ use std::ffi::CString;
 use z3_sys::*;
 use Context;
 use Symbol;
-use Z3_MUTEX;
 
 impl<'ctx> Symbol<'ctx> {
     /// Create a Z3 symbol using an integer.
@@ -17,10 +16,7 @@ impl<'ctx> Symbol<'ctx> {
         Symbol {
             ctx,
             cst: None,
-            z3_sym: {
-                let guard = Z3_MUTEX.lock().unwrap();
-                unsafe { Z3_mk_int_symbol(ctx.z3_ctx, i as ::std::os::raw::c_int) }
-            },
+            z3_sym: { unsafe { Z3_mk_int_symbol(ctx.z3_ctx, i as ::std::os::raw::c_int) } },
         }
     }
 
@@ -35,10 +31,7 @@ impl<'ctx> Symbol<'ctx> {
         Symbol {
             ctx,
             cst: Some(ss),
-            z3_sym: unsafe {
-                let guard = Z3_MUTEX.lock().unwrap();
-                Z3_mk_string_symbol(ctx.z3_ctx, p)
-            },
+            z3_sym: unsafe { Z3_mk_string_symbol(ctx.z3_ctx, p) },
         }
     }
 }

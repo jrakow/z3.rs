@@ -5,7 +5,6 @@ use Ast;
 use Context;
 use Model;
 use Solver;
-use Z3_MUTEX;
 
 impl<'ctx> Solver<'ctx> {
     /// Create a new solver. This solver is a "combined solver"
@@ -50,7 +49,6 @@ impl<'ctx> Solver<'ctx> {
         Solver {
             ctx,
             z3_slv: unsafe {
-                let guard = Z3_MUTEX.lock().unwrap();
                 let s = Z3_mk_solver(ctx.z3_ctx);
                 Z3_solver_inc_ref(ctx.z3_ctx, s);
                 s
@@ -62,7 +60,6 @@ impl<'ctx> Solver<'ctx> {
         Solver {
             ctx: dest,
             z3_slv: unsafe {
-                let guard = Z3_MUTEX.lock().unwrap();
                 let s = Z3_solver_translate(self.ctx.z3_ctx, self.z3_slv, dest.z3_ctx);
                 Z3_solver_inc_ref(dest.z3_ctx, s);
                 s
@@ -80,7 +77,6 @@ impl<'ctx> Solver<'ctx> {
     ///
     /// - [`Solver::assert_and_track()`](#method.assert_and_track)
     pub fn assert(&self, ast: &Ast<'ctx>) {
-        let guard = Z3_MUTEX.lock().unwrap();
         unsafe { Z3_solver_assert(self.ctx.z3_ctx, self.z3_slv, ast.z3_ast) };
     }
 
@@ -103,13 +99,11 @@ impl<'ctx> Solver<'ctx> {
     ///
     /// - [`Solver::assert()`](#method.assert)
     pub fn assert_and_track(&self, ast: &Ast<'ctx>, p: &Ast<'ctx>) {
-        let guard = Z3_MUTEX.lock().unwrap();
         unsafe { Z3_solver_assert(self.ctx.z3_ctx, self.z3_slv, ast.z3_ast) };
     }
 
     /// Remove all assertions from the solver.
     pub fn reset(&self) {
-        let guard = Z3_MUTEX.lock().unwrap();
         unsafe { Z3_solver_reset(self.ctx.z3_ctx, self.z3_slv) };
     }
 
@@ -137,7 +131,6 @@ impl<'ctx> Solver<'ctx> {
     /// [model construction is enabled]: struct.Config.html#method.set_model_generation
     /// [proof generation was enabled]: struct.Config.html#method.set_proof_generation
     pub fn check(&self) -> bool {
-        let guard = Z3_MUTEX.lock().unwrap();
         unsafe { Z3_solver_check(self.ctx.z3_ctx, self.z3_slv) == Z3_L_TRUE }
     }
 
@@ -153,7 +146,6 @@ impl<'ctx> Solver<'ctx> {
     ///
     /// - [`Solver::check()`](#method.check)
     pub fn check_assumptions(&self, assumptions: &[Ast<'ctx>]) -> bool {
-        let guard = Z3_MUTEX.lock().unwrap();
         let a: Vec<Z3_ast> = assumptions.iter().map(|a| a.z3_ast).collect();
         unsafe {
             Z3_solver_check_assumptions(self.ctx.z3_ctx, self.z3_slv, a.len() as u32, a.as_ptr())
@@ -169,7 +161,6 @@ impl<'ctx> Solver<'ctx> {
     ///
     /// - [`Solver::pop()`](#method.pop)
     pub fn push(&self) {
-        let guard = Z3_MUTEX.lock().unwrap();
         unsafe { Z3_solver_push(self.ctx.z3_ctx, self.z3_slv) };
     }
 
@@ -179,7 +170,6 @@ impl<'ctx> Solver<'ctx> {
     ///
     /// - [`Solver::push()`](#method.push)
     pub fn pop(&self, n: u32) {
-        let guard = Z3_MUTEX.lock().unwrap();
         unsafe { Z3_solver_pop(self.ctx.z3_ctx, self.z3_slv, n) };
     }
 
@@ -206,7 +196,6 @@ impl<'ctx> Solver<'ctx> {
     ///
     /// [proof generation is not enabled]: struct.Config.html#method.set_proof_generation
     pub fn get_proof(&self) -> Ast<'ctx> {
-        let guard = Z3_MUTEX.lock().unwrap();
         Ast::new(self.ctx, unsafe {
             Z3_solver_get_proof(self.ctx.z3_ctx, self.z3_slv)
         })
@@ -229,7 +218,6 @@ impl<'ctx> fmt::Display for Solver<'ctx> {
 
 impl<'ctx> Drop for Solver<'ctx> {
     fn drop(&mut self) {
-        let guard = Z3_MUTEX.lock().unwrap();
         unsafe { Z3_solver_dec_ref(self.ctx.z3_ctx, self.z3_slv) };
     }
 }
