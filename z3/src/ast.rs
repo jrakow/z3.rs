@@ -347,7 +347,18 @@ impl<'ctx> Ast<'ctx> {
     }
 
     pub fn forall_const(ctx: &'ctx Context, bounds: &[&Ast<'ctx>], body: &Ast<'ctx>) -> Ast<'ctx> {
+        Self::forall_const_weight_patterns(ctx, 0, bounds, &[], body)
+    }
+
+    pub fn forall_const_weight_patterns(
+        ctx: &'ctx Context,
+        weight: usize,
+        bounds: &[&Ast<'ctx>],
+        patterns: &[&Pattern<'ctx>],
+        body: &Ast<'ctx>,
+    ) -> Ast<'ctx> {
         assert!(bounds.iter().all(|a| a.ctx.z3_ctx == ctx.z3_ctx));
+        assert!(patterns.iter().all(|a| a.ctx.z3_ctx == ctx.z3_ctx));
         assert_eq!(ctx.z3_ctx, body.ctx.z3_ctx);
 
         if bounds.is_empty() {
@@ -355,15 +366,16 @@ impl<'ctx> Ast<'ctx> {
         }
 
         let bounds: Vec<_> = bounds.iter().map(|a| a.z3_ast).collect();
+        let patterns: Vec<_> = patterns.iter().map(|a| a.z3_pattern).collect();
 
         Ast::new(ctx, unsafe {
             Z3_mk_forall_const(
                 ctx.z3_ctx,
-                0,
+                weight.try_into().unwrap(),
                 bounds.len().try_into().unwrap(),
                 bounds.as_ptr() as *const Z3_app,
-                0,
-                std::ptr::null(),
+                patterns.len().try_into().unwrap(),
+                patterns.as_ptr(),
                 body.z3_ast,
             )
         })

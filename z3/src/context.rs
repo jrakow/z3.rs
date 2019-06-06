@@ -201,6 +201,16 @@ impl Context {
         Ast::forall_const(self, bounds, body)
     }
 
+    pub fn forall_const_weight_patterns<'ctx>(
+        &'ctx self,
+        weight: usize,
+        bounds: &[&Ast<'ctx>],
+        patterns: &[&Pattern<'ctx>],
+        body: &Ast<'ctx>,
+    ) -> Ast<'ctx> {
+        Ast::forall_const_weight_patterns(self, weight, bounds, patterns, body)
+    }
+
     pub fn pattern<'ctx>(&'ctx self, terms: &[&Ast<'ctx>]) -> Pattern<'ctx> {
         Pattern::new(self, terms)
     }
