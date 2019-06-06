@@ -4,10 +4,10 @@ use std::ffi::{CStr, CString};
 use std::fmt;
 use std::hash::{Hash, Hasher};
 use z3_sys::*;
-use Ast;
 use Context;
 use Sort;
 use Symbol;
+use {Ast, Pattern};
 
 macro_rules! unop {
     ( $f:ident, $z3fn:ident ) => {

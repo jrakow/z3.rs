@@ -1,10 +1,10 @@
 use z3_sys::*;
-use Ast;
 use Config;
 use Context;
 use FuncDecl;
 use Sort;
 use Symbol;
+use {Ast, Pattern};
 
 impl Context {
     pub fn new(cfg: &Config) -> Context {
@@ -199,6 +199,10 @@ impl Context {
     /// ```
     pub fn forall_const<'ctx>(&'ctx self, bounds: &[&Ast<'ctx>], body: &Ast<'ctx>) -> Ast<'ctx> {
         Ast::forall_const(self, bounds, body)
+    }
+
+    pub fn pattern<'ctx>(&'ctx self, terms: &[&Ast<'ctx>]) -> Pattern<'ctx> {
+        Pattern::new(self, terms)
     }
 }
 
