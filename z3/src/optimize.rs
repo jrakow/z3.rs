@@ -93,6 +93,13 @@ impl<'ctx> Optimize<'ctx> {
     pub fn get_model(&self) -> Model<'ctx> {
         Model::of_optimize(self)
     }
+
+    pub fn get_help(&self) -> String {
+        unsafe {
+            let s = Z3_optimize_get_help(self.ctx.z3_ctx, self.z3_opt);
+            CStr::from_ptr(s).to_str().unwrap().to_string()
+        }
+    }
 }
 
 impl<'ctx> fmt::Display for Optimize<'ctx> {

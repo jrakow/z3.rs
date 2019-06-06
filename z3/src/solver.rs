@@ -200,6 +200,13 @@ impl<'ctx> Solver<'ctx> {
             Z3_solver_get_proof(self.ctx.z3_ctx, self.z3_slv)
         })
     }
+
+    pub fn get_help(&self) -> String {
+        unsafe {
+            let s = Z3_solver_get_help(self.ctx.z3_ctx, self.z3_slv);
+            CStr::from_ptr(s).to_str().unwrap().to_string()
+        }
+    }
 }
 
 impl<'ctx> fmt::Display for Solver<'ctx> {
