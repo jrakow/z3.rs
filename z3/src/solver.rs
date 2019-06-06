@@ -1,10 +1,10 @@
 use std::ffi::CStr;
 use std::fmt;
 use z3_sys::*;
-use Ast;
 use Context;
 use Model;
 use Solver;
+use {Ast, ParamDescrs};
 
 impl<'ctx> Solver<'ctx> {
     /// Create a new solver. This solver is a "combined solver"
@@ -205,6 +205,15 @@ impl<'ctx> Solver<'ctx> {
         unsafe {
             let s = Z3_solver_get_help(self.ctx.z3_ctx, self.z3_slv);
             CStr::from_ptr(s).to_str().unwrap().to_string()
+        }
+    }
+
+    pub fn get_param_descrs(&self) -> ParamDescrs<'ctx> {
+        unsafe {
+            ParamDescrs::new(
+                self.ctx,
+                Z3_solver_get_param_descrs(self.ctx.z3_ctx, self.z3_slv),
+            )
         }
     }
 }

@@ -15,6 +15,8 @@ mod context;
 mod func_decl;
 mod model;
 mod optimize;
+mod param_descrs;
+mod params;
 mod pattern;
 mod solver;
 mod sort;
@@ -85,4 +87,14 @@ pub struct FuncDecl<'ctx> {
 pub struct Pattern<'ctx> {
     ctx: &'ctx Context,
     z3_pattern: Z3_pattern,
+}
+
+pub struct Params<'ctx> {
+    ctx: &'ctx Context,
+    z3_params: Z3_params,
+}
+
+pub struct ParamDescrs<'ctx> {
+    ctx: &'ctx Context,
+    z3_param_descrs: Z3_param_descrs,
 }

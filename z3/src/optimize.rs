@@ -1,10 +1,10 @@
 use std::ffi::CStr;
 use std::fmt;
 use z3_sys::*;
-use Ast;
 use Context;
 use Model;
 use Optimize;
+use {Ast, ParamDescrs};
 
 impl<'ctx> Optimize<'ctx> {
     /// Create a new optimize context.
@@ -98,6 +98,15 @@ impl<'ctx> Optimize<'ctx> {
         unsafe {
             let s = Z3_optimize_get_help(self.ctx.z3_ctx, self.z3_opt);
             CStr::from_ptr(s).to_str().unwrap().to_string()
+        }
+    }
+
+    pub fn get_param_descrs(&self) -> ParamDescrs<'ctx> {
+        unsafe {
+            ParamDescrs::new(
+                self.ctx,
+                Z3_optimize_get_param_descrs(self.ctx.z3_ctx, self.z3_opt),
+            )
         }
     }
 }

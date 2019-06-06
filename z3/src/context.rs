@@ -4,7 +4,7 @@ use Context;
 use FuncDecl;
 use Sort;
 use Symbol;
-use {Ast, Pattern};
+use {Ast, Params, Pattern};
 
 impl Context {
     pub fn new(cfg: &Config) -> Context {
@@ -213,6 +213,10 @@ impl Context {
 
     pub fn pattern<'ctx>(&'ctx self, terms: &[&Ast<'ctx>]) -> Pattern<'ctx> {
         Pattern::new(self, terms)
+    }
+
+    pub fn params<'ctx>(&'ctx self) -> Params<'ctx> {
+        Params::new(self)
     }
 }
 
