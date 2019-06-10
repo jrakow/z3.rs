@@ -346,6 +346,10 @@ impl<'ctx> Ast<'ctx> {
         })
     }
 
+    pub fn simplify(&self) -> Ast<'ctx> {
+        unsafe { Ast::new(self.ctx, Z3_simplify(self.ctx.z3_ctx, self.z3_ast)) }
+    }
+
     pub fn forall_const(ctx: &'ctx Context, bounds: &[&Ast<'ctx>], body: &Ast<'ctx>) -> Ast<'ctx> {
         Self::forall_const_weight_patterns(ctx, 0, bounds, &[], body)
     }
