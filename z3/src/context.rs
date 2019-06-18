@@ -201,6 +201,10 @@ impl Context {
         Ast::forall_const(self, bounds, body)
     }
 
+    pub fn exists_const<'ctx>(&'ctx self, bounds: &[&Ast<'ctx>], body: &Ast<'ctx>) -> Ast<'ctx> {
+        Ast::exists_const(self, bounds, body)
+    }
+
     pub fn forall_const_weight_patterns<'ctx>(
         &'ctx self,
         weight: usize,

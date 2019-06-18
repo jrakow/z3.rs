@@ -3,6 +3,7 @@ use std::convert::TryInto;
 use std::ffi::{CStr, CString};
 use std::fmt;
 use std::hash::{Hash, Hasher};
+use std::ptr::null;
 use z3_sys::*;
 use Context;
 use Sort;
@@ -380,6 +381,29 @@ impl<'ctx> Ast<'ctx> {
                 bounds.as_ptr() as *const Z3_app,
                 patterns.len().try_into().unwrap(),
                 patterns.as_ptr(),
+                body.z3_ast,
+            )
+        })
+    }
+
+    pub fn exists_const(ctx: &'ctx Context, bounds: &[&Ast<'ctx>], body: &Ast<'ctx>) -> Ast<'ctx> {
+        assert!(bounds.iter().all(|a| a.ctx.z3_ctx == ctx.z3_ctx));
+        assert_eq!(ctx.z3_ctx, body.ctx.z3_ctx);
+
+        if bounds.is_empty() {
+            return body.clone();
+        }
+
+        let bounds: Vec<_> = bounds.iter().map(|a| a.z3_ast).collect();
+
+        Ast::new(ctx, unsafe {
+            Z3_mk_exists_const(
+                ctx.z3_ctx,
+                0,
+                bounds.len().try_into().unwrap(),
+                bounds.as_ptr() as *const Z3_app,
+                0,
+                null(),
                 body.z3_ast,
             )
         })
