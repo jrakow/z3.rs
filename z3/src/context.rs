@@ -156,6 +156,22 @@ impl Context {
         Ast::from_bool(self, b)
     }
 
+    pub fn from_usize(&self, u: usize) -> Ast {
+        Ast::from_usize(self, u)
+    }
+
+    pub fn from_isize(&self, i: isize) -> Ast {
+        Ast::from_isize(self, i)
+    }
+
+    pub fn from_u32(&self, u: u32) -> Ast {
+        Ast::from_u32(self, u)
+    }
+
+    pub fn from_i32(&self, i: i32) -> Ast {
+        Ast::from_i32(self, i)
+    }
+
     pub fn from_u64(&self, u: u64) -> Ast {
         Ast::from_u64(self, u)
     }

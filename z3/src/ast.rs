@@ -98,6 +98,28 @@ impl<'ctx> Ast<'ctx> {
         })
     }
 
+    pub fn from_isize(ctx: &'ctx Context, i: isize) -> Ast<'ctx> {
+        Ast::from_i64(ctx, i.try_into().unwrap())
+    }
+
+    pub fn from_usize(ctx: &'ctx Context, i: usize) -> Ast<'ctx> {
+        Ast::from_u64(ctx, i.try_into().unwrap())
+    }
+
+    pub fn from_i32(ctx: &'ctx Context, i: i32) -> Ast<'ctx> {
+        Ast::new(ctx, unsafe {
+            let sort = ctx.int_sort();
+            Z3_mk_int(ctx.z3_ctx, i, sort.z3_sort)
+        })
+    }
+
+    pub fn from_u32(ctx: &'ctx Context, u: u32) -> Ast<'ctx> {
+        Ast::new(ctx, unsafe {
+            let sort = ctx.int_sort();
+            Z3_mk_unsigned_int(ctx.z3_ctx, u, sort.z3_sort)
+        })
+    }
+
     pub fn from_i64(ctx: &'ctx Context, i: i64) -> Ast<'ctx> {
         Ast::new(ctx, unsafe {
             let sort = ctx.int_sort();
@@ -128,6 +150,36 @@ impl<'ctx> Ast<'ctx> {
                 Z3_L_TRUE => Some(true),
                 Z3_L_FALSE => Some(false),
                 _ => None,
+            }
+        }
+    }
+
+    pub fn as_isize(&self) -> Option<isize> {
+        self.as_i64().map(|i| i.try_into().unwrap())
+    }
+
+    pub fn as_usize(&self) -> Option<usize> {
+        self.as_u64().map(|i| i.try_into().unwrap())
+    }
+
+    pub fn as_i32(&self) -> Option<i32> {
+        unsafe {
+            let mut tmp: ::std::os::raw::c_int = 0;
+            if Z3_get_numeral_int(self.ctx.z3_ctx, self.z3_ast, &mut tmp) {
+                Some(tmp)
+            } else {
+                None
+            }
+        }
+    }
+
+    pub fn as_u32(&self) -> Option<u32> {
+        unsafe {
+            let mut tmp: ::std::os::raw::c_uint = 0;
+            if Z3_get_numeral_uint(self.ctx.z3_ctx, self.z3_ast, &mut tmp) {
+                Some(tmp)
+            } else {
+                None
             }
         }
     }
