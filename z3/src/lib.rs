@@ -12,6 +12,7 @@ use z3_sys::*;
 mod ast;
 mod config;
 mod context;
+mod datatype_builder;
 mod func_decl;
 mod model;
 mod optimize;
@@ -97,4 +98,53 @@ pub struct Params<'ctx> {
 pub struct ParamDescrs<'ctx> {
     ctx: &'ctx Context,
     z3_param_descrs: Z3_param_descrs,
+}
+
+/// Build a datatype sort.
+///
+/// Example:
+/// ```
+/// # use z3::{Config, Context, DatatypeBuilder, Solver};
+/// # let cfg = Config::new();
+/// # let ctx = Context::new(&cfg);
+/// # let solver = Solver::new(&ctx);
+///
+/// // Like Rust's Option<int> type
+/// let option_int = DatatypeBuilder::new(&ctx)
+///         .variant("None", &[])
+///         .variant("Some", &[("value", &ctx.int_sort())])
+///         .finish("OptionInt");
+///
+/// // Assert x.is_none()
+/// let x = ctx.named_const("x", &option_int.sort);
+/// solver.assert(&option_int.variants[0].tester.apply(&[&x]));
+///
+/// // Assert y == Some(r)
+/// let y = ctx.named_const("y", &option_int.sort);
+/// let value = option_int.variants[1].constructor.apply(&[&ctx.from_i64(3)]);
+/// solver.assert(&y._eq(&value));
+///
+/// assert!(solver.check());
+/// let model = solver.get_model();
+///
+/// // Get the value out of Some(3)
+/// let ast = option_int.variants[1].accessors[0].apply(&[&y]);
+/// assert_eq!(3, model.eval(&ast).unwrap().as_i64().unwrap());
+/// ```
+pub struct DatatypeBuilder<'ctx> {
+    ctx: &'ctx Context,
+    // num_fields and constructor
+    variants: Vec<(usize, Z3_constructor)>,
+}
+
+pub struct DatatypeVariant<'ctx> {
+    pub constructor: FuncDecl<'ctx>,
+    pub tester: FuncDecl<'ctx>,
+    pub accessors: Vec<FuncDecl<'ctx>>,
+}
+
+pub struct Datatype<'ctx> {
+    ctx: &'ctx Context,
+    pub sort: Sort<'ctx>,
+    pub variants: Vec<DatatypeVariant<'ctx>>,
 }
