@@ -30,6 +30,16 @@ macro_rules! binop {
     };
 }
 
+macro_rules! binop_bool {
+    ( $f:ident, $z3fn:ident ) => {
+        pub fn $f(&self, other: &Ast<'ctx>, b: bool) -> Ast<'ctx> {
+            Ast::new(self.ctx, unsafe {
+                $z3fn(self.ctx.z3_ctx, self.z3_ast, other.z3_ast, b)
+            })
+    }
+    };
+}
+
 macro_rules! trinop {
     ( $f:ident, $z3fn:ident ) => {
         pub fn $f(&self, a: &Ast<'ctx>, b: &Ast<'ctx>) -> Ast<'ctx> {
@@ -332,6 +342,16 @@ impl<'ctx> Ast<'ctx> {
     binop!(bvashr, Z3_mk_bvashr);
     binop!(bvrotl, Z3_mk_ext_rotate_left);
     binop!(bvrotr, Z3_mk_ext_rotate_right);
+
+    // overflow checks
+    binop_bool!(bvadd_no_overflow, Z3_mk_bvadd_no_overflow);
+    binop!(bvadd_no_underflow, Z3_mk_bvadd_no_underflow);
+    binop!(bvsub_no_overflow, Z3_mk_bvsub_no_overflow);
+    binop_bool!(bvsub_no_underflow, Z3_mk_bvsub_no_underflow);
+    binop!(bvsdiv_no_overflow, Z3_mk_bvsdiv_no_overflow);
+    unop!(bvneg_no_overflow, Z3_mk_bvneg_no_overflow);
+    binop_bool!(bvmul_no_overflow, Z3_mk_bvmul_no_overflow);
+    binop!(bvmul_no_underflow, Z3_mk_bvmul_no_underflow);
 
     // Array ops
     binop!(select, Z3_mk_select);
