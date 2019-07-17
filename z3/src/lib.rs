@@ -21,6 +21,7 @@ mod params;
 mod pattern;
 mod solver;
 mod sort;
+mod stats;
 mod symbol;
 
 /// Configuration used to initialize logical contexts.
@@ -98,6 +99,11 @@ pub struct Params<'ctx> {
 pub struct ParamDescrs<'ctx> {
     ctx: &'ctx Context,
     z3_param_descrs: Z3_param_descrs,
+}
+
+pub struct Stats<'ctx> {
+    ctx: &'ctx Context,
+    z3_stats: Z3_stats,
 }
 
 /// Build a datatype sort.
