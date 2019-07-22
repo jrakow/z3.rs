@@ -26,7 +26,6 @@ mod symbol;
 
 /// Configuration used to initialize logical contexts.
 pub struct Config {
-    kvs: Vec<(CString, CString)>,
     z3_cfg: Z3_config,
 }
 

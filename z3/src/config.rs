@@ -5,7 +5,6 @@ use Config;
 impl Config {
     pub fn new() -> Config {
         Config {
-            kvs: Vec::new(),
             z3_cfg: unsafe {
                 let p = Z3_mk_config();
                 debug!("new config {:p}", p);
@@ -16,12 +15,11 @@ impl Config {
     pub fn set_param_value(&mut self, k: &str, v: &str) {
         let ks = CString::new(k).unwrap();
         let vs = CString::new(v).unwrap();
-        self.kvs.push((ks, vs));
         unsafe {
             Z3_set_param_value(
                 self.z3_cfg,
-                self.kvs.last().unwrap().0.as_ptr(),
-                self.kvs.last().unwrap().1.as_ptr(),
+                ks.as_ptr(),
+                vs.as_ptr(),
             )
         };
     }
