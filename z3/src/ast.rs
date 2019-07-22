@@ -342,6 +342,26 @@ impl<'ctx> Ast<'ctx> {
     binop!(bvashr, Z3_mk_bvashr);
     binop!(bvrotl, Z3_mk_ext_rotate_left);
     binop!(bvrotr, Z3_mk_ext_rotate_right);
+    pub fn bvextract(&self, high: usize, low: usize) -> Ast<'ctx> {
+        Ast::new(self.ctx, unsafe {
+            Z3_mk_extract(self.ctx.z3_ctx, high.try_into().unwrap(), low.try_into().unwrap(), self.z3_ast)
+        })
+    }
+    pub fn bvrepeat(&self, n: usize) -> Ast<'ctx> {
+        Ast::new(self.ctx, unsafe {
+            Z3_mk_repeat(self.ctx.z3_ctx, n.try_into().unwrap(), self.z3_ast)
+        })
+    }
+    pub fn bvsignextend(&self, n: usize) -> Ast<'ctx> {
+        Ast::new(self.ctx, unsafe {
+            Z3_mk_sign_ext(self.ctx.z3_ctx, n.try_into().unwrap(), self.z3_ast)
+        })
+    }
+    pub fn bvzeroextend(&self, n: usize) -> Ast<'ctx> {
+        Ast::new(self.ctx, unsafe {
+            Z3_mk_zero_ext(self.ctx.z3_ctx, n.try_into().unwrap(), self.z3_ast)
+        })
+    }
 
     // overflow checks
     binop_bool!(bvadd_no_overflow, Z3_mk_bvadd_no_overflow);
