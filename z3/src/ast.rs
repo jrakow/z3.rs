@@ -500,6 +500,17 @@ impl<'ctx> Ast<'ctx> {
             )
         })
     }
+
+    pub fn sort(&self) -> Sort<'ctx> {
+        Sort {
+            ctx: self.ctx,
+            z3_sort: unsafe {
+                let s = Z3_get_sort(self.ctx.z3_ctx, self.z3_ast);
+                Z3_inc_ref(self.ctx.z3_ctx, Z3_sort_to_ast(self.ctx.z3_ctx, s));
+                s
+            },
+        }
+    }
 }
 
 impl<'ctx> fmt::Display for Ast<'ctx> {
