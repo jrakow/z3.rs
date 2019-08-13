@@ -39,7 +39,7 @@ fn test_solving() {
 
     let solver = Solver::new(&ctx);
     solver.assert(&x.gt(&y));
-    assert!(solver.check());
+    assert!(solver.check().unwrap());
 }
 
 #[test]
@@ -58,7 +58,7 @@ fn test_solving_for_model() {
     solver.assert(&y.gt(&zero));
     solver.assert(&y.rem(&seven)._eq(&two));
     solver.assert(&x.add(&[&two]).gt(&seven));
-    assert!(solver.check());
+    assert!(solver.check().unwrap());
 
     let model = solver.get_model();
     let xv = model.eval(&x).unwrap().as_i64().unwrap();
@@ -81,7 +81,7 @@ fn test_cloning_ast() {
 
     let solver = Solver::new(&ctx);
     solver.assert(&x._eq(&zero));
-    assert!(solver.check());
+    assert!(solver.check().unwrap());
 
     let model = solver.get_model();
     let xv = model.eval(&x).unwrap().as_i64().unwrap();
@@ -112,10 +112,10 @@ fn test_ast_translate() {
 
     let slv = Solver::new(&destination);
     slv.assert(&translated_a._eq(&destination.from_u64(2)));
-    assert!(slv.check());
+    assert!(slv.check().unwrap());
 
     slv.assert(&translated_a._eq(&destination.from_u64(3)));
-    assert!(!slv.check());
+    assert!(!slv.check().unwrap());
 }
 
 #[test]
@@ -129,13 +129,13 @@ fn test_solver_translate() {
 
     let slv = Solver::new(&destination);
     slv.assert(&translated_a._eq(&destination.from_u64(2)));
-    assert!(slv.check());
+    assert!(slv.check().unwrap());
 
     let translated_slv = slv.translate(&source);
     // Add a new constraint, make the old one unsatisfiable, while the copy remains satisfiable.
     slv.assert(&translated_a._eq(&destination.from_u64(3)));
-    assert!(!slv.check());
-    assert!(translated_slv.check());
+    assert!(!slv.check().unwrap());
+    assert!(translated_slv.check().unwrap());
 }
 
 #[test]
@@ -149,7 +149,7 @@ fn test_pb_ops_model() {
     let other_args = vec![&y];
     let solver = Solver::new(&ctx);
     solver.assert(&x.pb_eq(&other_args[..], coeffs, 1));
-    assert!(solver.check());
+    assert!(solver.check().unwrap());
     let model = solver.get_model();
     let xv = model.eval(&x).unwrap().as_bool().unwrap();
     let yv = model.eval(&y).unwrap().as_bool().unwrap();
@@ -169,5 +169,5 @@ fn function_ref_count() {
     let _f = ctx.func_decl(ctx.str_sym("f"), &[&int_sort], &int_sort);
     let _g = ctx.func_decl(ctx.str_sym("g"), &[&int_sort], &int_sort);
 
-    assert!(solver.check());
+    assert!(solver.check().unwrap());
 }

@@ -130,8 +130,12 @@ impl<'ctx> Solver<'ctx> {
     ///
     /// [model construction is enabled]: struct.Config.html#method.set_model_generation
     /// [proof generation was enabled]: struct.Config.html#method.set_proof_generation
-    pub fn check(&self) -> bool {
-        unsafe { Z3_solver_check(self.ctx.z3_ctx, self.z3_slv) == Z3_L_TRUE }
+    pub fn check(&self) -> Option<bool> {
+        match unsafe { Z3_solver_check(self.ctx.z3_ctx, self.z3_slv) } {
+            Z3_L_FALSE => Some(false),
+            Z3_L_UNDEF => None,
+            Z3_L_TRUE => Some(true),
+        }
     }
 
     /// Check whether the assertions in the given solver and
