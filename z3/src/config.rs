@@ -15,13 +15,7 @@ impl Config {
     pub fn set_param_value(&mut self, k: &str, v: &str) {
         let ks = CString::new(k).unwrap();
         let vs = CString::new(v).unwrap();
-        unsafe {
-            Z3_set_param_value(
-                self.z3_cfg,
-                ks.as_ptr(),
-                vs.as_ptr(),
-            )
-        };
+        unsafe { Z3_set_param_value(self.z3_cfg, ks.as_ptr(), vs.as_ptr()) };
     }
 
     pub fn set_bool_param_value(&mut self, k: &str, v: bool) {

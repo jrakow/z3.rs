@@ -344,7 +344,12 @@ impl<'ctx> Ast<'ctx> {
     binop!(bvrotr, Z3_mk_ext_rotate_right);
     pub fn bvextract(&self, high: usize, low: usize) -> Ast<'ctx> {
         Ast::new(self.ctx, unsafe {
-            Z3_mk_extract(self.ctx.z3_ctx, high.try_into().unwrap(), low.try_into().unwrap(), self.z3_ast)
+            Z3_mk_extract(
+                self.ctx.z3_ctx,
+                high.try_into().unwrap(),
+                low.try_into().unwrap(),
+                self.z3_ast,
+            )
         })
     }
     pub fn bvrepeat(&self, n: usize) -> Ast<'ctx> {
